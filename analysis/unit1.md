@@ -1,0 +1,32 @@
+# Modeling Justification
+
+### 1. Primary Key Architecture and Granularity
+- **Surrogate `bigint` Keys for Entities and Facts (`actor`, `producer`, `catalog`, `event`):** Natural attributes, such as `display_name`, are mutable, non-unique, and subject to user edits or duplicate entries. Using surrogate `bigint` keys guarantees entity integrity through permanent, immutable system identifiers. Compact 8-byte integers significantly optimize B-tree index traversal, reduce foreign key storage footprint across large volumes of data, and maximize join execution speeds.
+- **Surrogate Grain for the Fact Table (`event_id`):** Rather than defining the `event` grain via a composite natural key such as `(actor_id, producer_id, occurred_at)`, an artificial surrogate `event_id` is assigned. This critical design decision decouples physical record identity from database server clock resolution. It permits an actor to trigger multiple high-frequency interactions (such as rapid likes or sequential video milestones) within the exact same sub-second timestamp without causing primary key collision or write serialization failures.
+- **Composite Natural Key for the Junction Table (`producer_catalog`):** In contrast to the entity tables, the `producer_catalog` relationship table utilizes a composite primary key formed by `(producer_id, catalog_id)`. Because this table represents a pure many-to-many associative relationship rather than an independent business entity, the composite key inherently prevents duplicate tag assignments at the relational level while eliminating the storage and indexing overhead of an unnecessary surrogate identifier.
+
+### 2. Referential Integrity and Asymmetric `ON DELETE` Policies
+- **`ON DELETE RESTRICT` on Fact Table Foreign Keys (`actor_id`, `producer_id`):** The `event` table constitutes an immutable historical audit log and fact table for engagement analytics. Hard-deleting parent actors or producers would either destroy analytical history (`CASCADE`) or leave orphaned, invalid foreign keys. `RESTRICT` enforces that historical data cannot be accidentally deleted. Account deactivation or off-boarding must follow deliberate administrative soft-delete workflows—specifically flagging `producer.is_active = false` or anonymizing personal display names—preserving historical `SUM` and `COUNT` metrics without breaking referential integrity.
+- **Asymmetric Deletion Strategy on Junctions (`producer_catalog`):** The junction table employs an intentional asymmetry between its two foreign key relationships:
+  - `producer_id` $\rightarrow$ **`CASCADE`**: A producer’s category tags represent dependent metadata. If a newly created producer with no historical events is deleted, cascading the deletion to clean up their specific tag associations prevents orphan junction records without collateral damage.
+  - `catalog_id` $\rightarrow$ **`RESTRICT`**: Catalog categories function as shared reference taxonomies across the entire platform. A cascading delete on a category (such as deleting `"Music"`) would trigger an untargeted bulk untagging across thousands of active producers, corrupting catalog-driven search and classification. `RESTRICT` mandates an explicit two-step administrative workflow: reassigning or untagging member producers prior to category retirement.
+
+### 3. Schema Enforcement vs. Application Layer Boundaries
+- **Enforced at the Database Schema Layer (DDL):**
+  - **Whitespace and Empty String Guards:** `NOT NULL` alone allows empty strings (`''`) or whitespace strings. Adding `CHECK (length(btrim(column_name)) > 0)` across text attributes enforces meaningful character data at the storage layer before write commitment.
+  - **Numeric Domain Invariants:** Analytic integrity relies on valid metrics. Constraints such as `CHECK (follower_count >= 0)` and `CHECK (engagement_score >= 0)` guarantee that aggregate calculations (`SUM`, `AVG`) cannot be skewed by corrupt negative data.
+  - **Controlled Vocabulary Uniqueness:** `UNIQUE (catalog_name)` ensures category taxonomy remains standardized, preventing fragmented variations that would split query groupings.
+- **Deferred to the Application Layer:**
+  - **Extensible Event Typologies:** The `event_type` attribute uses open `text` rather than a database `ENUM` or rigid `CHECK (event_type IN (...))`. This enables engineering teams to deploy new interaction types without executing intrusive schema migration locks on high-traffic tables.
+  - **Omission of Real-Time Clock Bounds:** Rejecting `CHECK (occurred_at <= now())` is deliberate; strict real-time timestamp validations break historical data backfills, offline mobile event synchronizations, audit replays, and distributed system clock skew.
+
+# Reflection
+To be completely honest, this assignment took longer than I anticipated! While I have worked with databases for several years, my past experience was primarily centered around personal projects where schema modifications could be made on the fly without serious downstream consequences. Approaching database design from an enterprise standpoint—where schemas must be resilient, immutable, and rigorously constrained—was a different paradigm. This was my first time formally evaluating trade-offs at this level of rigor, and it highlighted areas where I want to continue refining my data modeling skills.
+
+One key conceptual decision was establishing the producer as the content creator and the actor as the consumer/viewer interacting with that content. Another designer might have modeled this domain differently—for instance, treating producers as advertising entities or organizations. Similarly, a designer might have chosen to enforce uniqueness on `display_name` across all users. Reflecting on this, separating a unique login `username` from a non-unique `display_name` remains an interesting alternative design consideration for balancing user identity with user presentation.
+
+### AI Use
+Grok 4.6 CLI and GitHub Copilot were referenced throughout this unit to reinforce concepts and review trade-offs - and to help with cleaning up and formatting content. Additionally, Grok 4.6 CLI was utilized to generate the initial Mermaid ERD diagram.
+
+**ERD Prompt:**
+> "Based on schema-definition.md file, please create the entity relationship diagram using Mermaid. Make sure to show every relationship with its cardinality. Use subagents to think about this and make a plan. After completion, use subagents to review for correctness."
