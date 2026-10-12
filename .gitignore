@@ -1,0 +1,10 @@
+# Course handouts live outside this repo. If one is copied in, do not commit it.
+# Patterns are anchored at the repo root so schema/schema.sql stays tracked.
+/Project3-assignment.pdf
+/airline.sql
+/gaming.sql
+/movies.sql
+/rental.sql
+/rideshare.sql
+/social.sql
+/ex603-Project-assignment3/
