@@ -83,7 +83,7 @@ Decisions worth noticing:
 | Unit | Query | Business question |
 | --- | --- | --- |
 | 3 | [`queries/unit3/q3_1.sql`](queries/unit3/q3_1.sql), [`q3_2.sql`](queries/unit3/q3_2.sql), [`q3_3.sql`](queries/unit3/q3_3.sql) | Of 200 reactions, how many were removed as spam, and which users took part in those removals? |
-| 4 | | |
+| 4 | [`queries/unit4/q4_1.sql`](queries/unit4/q4_1.sql), [`q4_2.sql`](queries/unit4/q4_2.sql) | Of 200 reactions, what share were removed as spam, and which posts contribute most to that rate? |
 | 5 | | |
 | 6 | | |
 
@@ -126,6 +126,13 @@ psql -d ex603_data -f queries/unit3/q3_3.sql
 
 `q3_2.sql` prints one expected error, `column "reason_label" does not exist`, and then continues with the repaired statements. The finding for the dashboard team is [`analysis/unit3-finding.md`](analysis/unit3-finding.md).
 
+Assignment 4 uses the same `ex603_data` database. The notes are [`analysis/unit4.md`](analysis/unit4.md). The finding for leadership is [`analysis/unit4-finding.md`](analysis/unit4-finding.md).
+
+```bash
+psql -d ex603_data -f queries/unit4/q4_1.sql
+psql -d ex603_data -f queries/unit4/q4_2.sql
+```
+
 ## Repository layout
 
 | Folder / file | What goes in it |
@@ -141,3 +148,5 @@ psql -d ex603_data -f queries/unit3/q3_3.sql
 Grok Build with Grok 4.7 was used on Assignment 2 to draft `schema/schema.sql`, the reasoning in `analysis/unit2.md`, and the ERD and README updates that keep those files in step with the script.
 
 Grok Build with Grok 4.7 was used on Assignment 3 to draft the queries in `queries/unit3`, the finding in `analysis/unit3-finding.md`, and the README notes for this unit. The queries were run locally against `ex603_data`. The screenshots were taken in the VS Code terminal.
+
+Grok Build with Grok 4.7 was used on Assignment 4 to draft the queries in `queries/unit4`, the notes in `analysis/unit4.md`, the finding in `analysis/unit4-finding.md`, and the README notes for this unit. The queries were run locally against `ex603_data`. The screenshots were taken in the VS Code terminal.
