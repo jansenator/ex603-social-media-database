@@ -7,5 +7,8 @@
 /rental.sql
 /rideshare.sql
 /social.sql
-/ex603-Project-assignment3/
 /assignments/
+
+# Local agent guidance files are not part of the submission.
+AGENTS.md
+CLAUDE.md
