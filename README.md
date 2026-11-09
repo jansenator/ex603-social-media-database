@@ -84,7 +84,7 @@ Decisions worth noticing:
 | --- | --- | --- |
 | 3 | [`queries/unit3/q3_1.sql`](queries/unit3/q3_1.sql), [`q3_2.sql`](queries/unit3/q3_2.sql), [`q3_3.sql`](queries/unit3/q3_3.sql) | Of 200 reactions, how many were removed as spam, and which users took part in those removals? |
 | 4 | [`queries/unit4/q4_1.sql`](queries/unit4/q4_1.sql), [`q4_2.sql`](queries/unit4/q4_2.sql) | Of 200 reactions, what share were removed as spam, and which posts contribute most to that rate? |
-| 5 | | |
+| 5 | [`queries/unit5/q5_1.sql`](queries/unit5/q5_1.sql), [`q5_2.sql`](queries/unit5/q5_2.sql), [`q5_3.sql`](queries/unit5/q5_3.sql) | Who reacted to which post, which posts have no reactions, and how does PostgreSQL run that join? |
 | 6 | | |
 
 ## Technical highlights
@@ -133,6 +133,14 @@ psql -d ex603_data -f queries/unit4/q4_1.sql
 psql -d ex603_data -f queries/unit4/q4_2.sql
 ```
 
+Assignment 5 uses the same `ex603_data` database. The notes are [`analysis/unit5.md`](analysis/unit5.md). The finding for leadership is [`analysis/unit5-finding.md`](analysis/unit5-finding.md).
+
+```bash
+psql -d ex603_data -f queries/unit5/q5_1.sql
+psql -d ex603_data -f queries/unit5/q5_2.sql
+psql -d ex603_data -f queries/unit5/q5_3.sql
+```
+
 ## Repository layout
 
 | Folder / file | What goes in it |
@@ -150,3 +158,5 @@ Grok Build with Grok 4.7 was used on Assignment 2 to draft `schema/schema.sql`, 
 Grok Build with Grok 4.7 was used on Assignment 3 to draft the queries in `queries/unit3`, the finding in `analysis/unit3-finding.md`, and the README notes for this unit. The queries were run locally against `ex603_data`. The screenshots were taken in the VS Code terminal.
 
 Grok Build with Grok 4.7 was used on Assignment 4 to draft the queries in `queries/unit4`, the notes in `analysis/unit4.md`, the finding in `analysis/unit4-finding.md`, and the README notes for this unit. The queries were run locally against `ex603_data`. The screenshots were taken in the VS Code terminal.
+
+Grok Build with Grok 4.7 was used on Assignment 5 to draft the queries in `queries/unit5`, the notes in `analysis/unit5.md`, the finding in `analysis/unit5-finding.md`, and the README notes for this unit. The queries were run locally against `ex603_data`. Screenshots of each statement are captured in the VS Code terminal.
